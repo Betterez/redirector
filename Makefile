@@ -1,5 +1,5 @@
 default:
-	@export GOPATH=$(pwd)
+	@export GOPATH=$('pwd')
 	@go install red
 
 run: default

@@ -10,9 +10,25 @@ func handler(w http.ResponseWriter, r *http.Request) {
     http.Redirect(w,r,location,302);
 }
 
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w,"everything is fine.")
+}
+
 func main() {
-  http.HandleFunc("/",handler);
-  port := ":5500"
-  fmt.Printf("server starting at port %s",port);
-  http.ListenAndServe(port, nil)
+  mux1 := http.NewServeMux();
+  mux1.HandleFunc("/",handler);
+  redirectionServer := &http.Server{
+    Addr: ":5500",
+    Handler: mux1,
+  }
+  go redirectionServer.ListenAndServe();
+
+  mux2 := http.NewServeMux();
+  mux2.HandleFunc("/",healthHandler);
+  healthcheckServer := &http.Server{
+    Addr: ":8080",
+    Handler: mux2,
+  }
+  fmt.Printf("\r\nserver is running.\r\n\r\n");
+  healthcheckServer.ListenAndServe();
 }
